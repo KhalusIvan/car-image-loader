@@ -4,56 +4,63 @@ const fs = require("fs");
 const path = require("path");
 const urlModule = require("url");
 
-const pageUrl = 'http://american-wheels.cars.ua/img/car/252511';
+// Run `node index.js` to execute this script
+const pageUrl = [
+    'http://american-wheels.cars.ua/img/car/252512',
+    'http://american-wheels.cars.ua/img/car/252511',
+    'http://american-wheels.cars.ua/img/car/252497',
+];
 
-async function downloadImagesFromUrl(pageUrl) {
-    try {
-        // Load HTML
-        const { data } = await axios.get(pageUrl);
-        const $ = cheerio.load(data);
+async function downloadImagesFromUrl(pageUrls) {
+    for (const pageUrl of pageUrls) {
+        try {
+            // Load HTML
+            const { data } = await axios.get(pageUrl);
+            const $ = cheerio.load(data);
 
-        const title = $("h1.car-title").text().trim();
-        console.log("Title:", title);
+            const title = $("h1.car-title").text().trim();
+            console.log("Title:", title);
 
-        // Create output folder
-        const folder = `images/${title}`;
-        if (!fs.existsSync(folder)) {
-            if (!fs.existsSync('images')) {
-                fs.mkdirSync('images');
+            // Create output folder
+            const folder = `images/${title}`;
+            if (!fs.existsSync(folder)) {
+                if (!fs.existsSync('images')) {
+                    fs.mkdirSync('images');
+                }
+                fs.mkdirSync(folder);
             }
-            fs.mkdirSync(folder);
-        }
 
-        // Find and download images
-        const imgUrls = [];
-        $(".open-gallery img").each((_, img) => {
-            const src = $(img).attr("src");
-            if (src) imgUrls.push(urlModule.resolve(pageUrl, src)); // Convert relative → absolute
-        });
-
-        console.log("Found", imgUrls.length, "images");
-        let counter = 1;
-
-        for (const imgUrl of imgUrls) {
-            const ext = path.extname(new URL(imgUrl).pathname) || ".jpg";
-            const filename = `${counter}${ext}`;
-            counter++;
-
-            const filePath = path.join(folder, filename);
-            const response = await axios.get(imgUrl, { responseType: "stream" });
-
-            await new Promise((resolve, reject) => {
-                const writer = fs.createWriteStream(filePath);
-                response.data.pipe(writer);
-                writer.on("finish", resolve);
-                writer.on("error", reject);
+            // Find and download images
+            const imgUrls = [];
+            $(".open-gallery img").each((_, img) => {
+                const src = $(img).attr("src");
+                if (src) imgUrls.push(urlModule.resolve(pageUrl, src)); // Convert relative → absolute
             });
 
-            console.log("Downloaded:", filename);
-        }
+            console.log("Found", imgUrls.length, "images");
+            let counter = 1;
 
-    } catch (err) {
-        console.error("Error:", err.message);
+            for (const imgUrl of imgUrls) {
+                const ext = path.extname(new URL(imgUrl).pathname) || ".jpg";
+                const filename = `${counter}${ext}`;
+                counter++;
+
+                const filePath = path.join(folder, filename);
+                const response = await axios.get(imgUrl, { responseType: "stream" });
+
+                await new Promise((resolve, reject) => {
+                    const writer = fs.createWriteStream(filePath);
+                    response.data.pipe(writer);
+                    writer.on("finish", resolve);
+                    writer.on("error", reject);
+                });
+
+                console.log("Downloaded:", filename);
+            }
+
+        } catch (err) {
+            console.error("Error:", err.message);
+        }
     }
 }
 
