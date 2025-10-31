@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const urlModule = require("url");
 
-const pageUrl = 'http://american-wheels.cars.ua/img/car/252463';
+const pageUrl = 'http://american-wheels.cars.ua/img/car/252511';
 
 async function downloadImagesFromUrl(pageUrl) {
     try {
@@ -18,7 +18,9 @@ async function downloadImagesFromUrl(pageUrl) {
         // Create output folder
         const folder = `images/${title}`;
         if (!fs.existsSync(folder)) {
-            fs.mkdirSync('images');
+            if (!fs.existsSync('images')) {
+                fs.mkdirSync('images');
+            }
             fs.mkdirSync(folder);
         }
 
