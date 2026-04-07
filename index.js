@@ -18,8 +18,10 @@ const newWebsiteDesiredType = null;
 const generateFolder = (title) => {
     console.log("Title:", title);
 
+    const safeTitle = title.replace(/\//g, '-');
+
     // Create output folder
-    const folder = `images/${title}`;
+    const folder = `images/${safeTitle}`;
     if (!fs.existsSync(folder)) {
         if (!fs.existsSync('images')) {
             fs.mkdirSync('images');
