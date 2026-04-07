@@ -9,7 +9,7 @@ const pageUrl = [
     //'http://american-wheels.cars.ua/img/car/252512',
     //'http://american-wheels.cars.ua/img/car/252511',
     //'http://american-wheels.cars.ua/img/car/252497',
-    'https://americanwheels.com.ua/cars-catalog/skoda_fabia__car_2904',
+    'https://www.americanwheels.com.ua/cars-catalog/toyota_land_cruiser_prado__car_3075',
 ];
 
 // 'small' || 'medium' || null;
@@ -102,6 +102,8 @@ async function downloadImageForNewWebsite(pageUrl) {
             return imgUrl.replace('medium_', '').replace('small_')
         })
 
+        imgUrlsMapped = imgUrlsMapped.slice(0, imgUrlsMapped.length / 2);
+
         if (newWebsiteDesiredType !== null) {
             imgUrlsMapped = imgUrlsMapped.map((imgUrl) => {
                 const parts = imgUrl.split('/');
@@ -109,6 +111,7 @@ async function downloadImageForNewWebsite(pageUrl) {
                 return parts.join('/');
             })
         }
+        console.log(imgUrlsMapped.length);
 
         await downloadImages(imgUrlsMapped, folder)
 
